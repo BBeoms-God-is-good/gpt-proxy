@@ -8,7 +8,7 @@
   "servers": [
     {
       "url": "https://gpt-proxy-fjov.onrender.com",
-      "description": "Production GPT Plugin Server"
+      "description": "Main Render server"
     }
   ],
   "paths": {
