@@ -2,11 +2,10 @@ openapi: 3.0.1
 info:
   title: Notion Tasks API
   version: "1.0.0"
-  description: API to fetch tasks from Notion DB through GPT plugin
+  description: API to fetch tasks from Notion DB
 
 servers:
   - url: https://romantic-jessica-seokbeom-27d22b09.koyeb.app
-    description: Koyeb deployed API server
 
 paths:
   /tasks:
