@@ -8,9 +8,11 @@ app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith(".yaml")) {
       res.setHeader("Content-Type", "application/yaml");
+      res.setHeader("Content-Disposition", "inline"); // 🔥 이 줄이 중요합니다!
     }
   }
 }));
+
 
 app.use(express.json());
 
