@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Notion Task Fetcher",
+  "name_for_model": "notion_task_plugin",
+  "description_for_human": "Get your tasks from Notion DB.",
+  "description_for_model": "Plugin for retrieving tasks from a Notion DB.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://gpt-proxy-fjov.onrender.com/openapi.yaml"
+  },
+  "logo_url": "https://gpt-proxy-fjov.onrender.com/logo.png",
+  "contact_email": "your@email.com",
+  "legal_info_url": "https://your-site.com/legal"
+}
