@@ -8,7 +8,7 @@
   "servers": [
     {
       "url": "https://chronic-janaya-seokbeom-f8bd352a.koyeb.app",
-      "description": "Koyeb deployed API server"
+      "description": "Main Koyeb server"
     }
   ],
   "paths": {
@@ -26,3 +26,17 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "title": { "type": "string" },
+                      "due": { "type": "string" },
+                      "description": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
