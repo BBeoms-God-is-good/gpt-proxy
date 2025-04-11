@@ -9,7 +9,7 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://gpt-proxy-fjov.onrender.com/openapi.json"
+    "url": "https://gpt-proxy-fjov.onrender.com/openapi.yaml"
   },
   "logo_url": "https://gpt-proxy-fjov.onrender.com/logo.png",
   "contact_email": "your@email.com",
