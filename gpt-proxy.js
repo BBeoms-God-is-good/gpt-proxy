@@ -1,11 +1,14 @@
 const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
 const express = require("express");
 const axios = require("axios");
 const app = express();
 
+// 🔧 public 폴더 정적 파일 서빙 (가장 먼저!)
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(express.json());
 
+// 📬 웹훅 수신 후 Make로 전달
 app.post("/gpt-webhook", async (req, res) => {
   try {
     await axios.post(
@@ -24,8 +27,7 @@ app.post("/gpt-webhook", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("🚀 프록시 서버 실행 중"));
-
+// ✅ GPT가 호출할 수 있는 테스트용 tasks API
 app.get("/tasks", (req, res) => {
   res.json([
     {
@@ -40,3 +42,6 @@ app.get("/tasks", (req, res) => {
     }
   ]);
 });
+
+// 🚀 서버 실행
+app.listen(3000, () => console.log("🚀 프록시 서버 실행 중"));
