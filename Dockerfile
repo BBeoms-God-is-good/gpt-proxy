@@ -1,20 +1,20 @@
-# 1. Node.js 기반 이미지
 FROM node:18
 
-# 2. 작업 디렉토리 설정
 WORKDIR /app
 
-# 3. 의존성 파일 복사
+# 캐시 클리어 후 설치
+RUN npm config set fetch-retries 5 \
+  && npm config set retry 5 \
+  && npm config set fetch-timeout 60000 \
+  && npm config set registry https://registry.npmjs.org/ \
+  && npm cache clean --force
+
 COPY package*.json ./
 
-# 4. 패키지 설치
-RUN npm install
+RUN npm install --no-cache --legacy-peer-deps || npm install --force
 
-# 5. 전체 소스 복사
 COPY . .
 
-# 6. 포트 명시 (선택)
 EXPOSE 3000
 
-# 7. 앱 실행
 CMD ["npm", "start"]
