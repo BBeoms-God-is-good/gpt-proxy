@@ -1,11 +1,12 @@
 openapi: 3.0.1
 info:
   title: Notion Tasks API
-  version: 1.0.0
-  description: API to fetch tasks from Notion DB through GPT plugin
+  version: "1.0.0"
+  description: API to fetch Notion task list
+
 servers:
-  - url: https://gpt-proxy-fjov.onrender.com
-    description: Main Render server
+  - url: https://romantic-jessica-seokbeom-27d22b09.koyeb.app
+
 paths:
   /tasks:
     get:
