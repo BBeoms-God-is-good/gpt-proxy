@@ -3,8 +3,14 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-// 🔧 public 폴더 정적 파일 서빙 (가장 먼저!)
-app.use(express.static(path.join(__dirname, "public")));
+// ✅ MIME 타입 설정 추가 (가장 먼저)
+app.use(express.static(path.join(__dirname, "public"), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".yaml")) {
+      res.setHeader("Content-Type", "application/yaml");
+    }
+  }
+}));
 
 app.use(express.json());
 
