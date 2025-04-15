@@ -1,9 +1,13 @@
 const path = require("path");
 const express = require("express");
 const axios = require("axios");
+const cors = require("cors"); // CORS 허용
 const app = express();
 
-// ✅ MIME 타입 설정
+app.use(cors());
+app.use(express.json());
+
+// ✅ MIME 타입 설정 (.yaml 보기용)
 app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith(".yaml")) {
@@ -13,19 +17,13 @@ app.use(express.static(path.join(__dirname, "public"), {
   }
 }));
 
-app.use(express.json());
-
 // 🔗 Webhook → Make로 전달
 app.post("/gpt-webhook", async (req, res) => {
   try {
     await axios.post(
       "https://hook.us2.make.com/gvug7if3cxsittuhskjkuuxaki8deh1s",
       req.body,
-      {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
     res.status(200).send("✅ 전달 완료");
   } catch (e) {
@@ -50,14 +48,14 @@ app.get("/tasks", (req, res) => {
   ]);
 });
 
-// =========================
+// ==========================
 // ✅ 1. Notion DB 불러오기
-// =========================
+// ==========================
 const notionToken = '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';
 const databaseId = '1c730b44dc0081018323e64ee18b9acb';
-const databaseId2 = '1d630b44dc0080eb9262f744b6b37e15';
 
-app.post('/get-notion-data', async (req, res) => {
+// GPT에서 호출할 operationId: fetchNotionData 에 맞는 함수
+async function fetchNotionData(req, res) {
   try {
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${databaseId}/query`,
@@ -86,16 +84,19 @@ app.post('/get-notion-data', async (req, res) => {
     console.error(error.response?.data || error.message);
     res.status(500).json({ error: 'Notion 데이터 불러오기 실패' });
   }
-});
+}
+app.post('/get-notion-data', fetchNotionData);
 
-// =========================
+// ==========================
 // ✅ 2. Notion DB에 저장하기
-// =========================
+// ==========================
+const databaseId2 = '1d630b44dc0080eb9262f744b6b37e15';
+
 app.post('/add-notion-task', async (req, res) => {
   const { title, deadline, status, duration } = req.body;
 
   try {
-    const createRes = await axios.post(
+    await axios.post(
       'https://api.notion.com/v1/pages',
       {
         parent: { database_id: databaseId2 },
