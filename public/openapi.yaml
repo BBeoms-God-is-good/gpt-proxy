@@ -1,30 +1,189 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
-  title: Notion Tasks API
-  version: "1.0.0"
-  description: API to fetch tasks from Notion DB
-
+  title: Schedule, Task, Prayer and Notion Proxy API
+  version: 1.4.0
 servers:
-  - url: http://chronic-janaya-seokbeom-f8bd352a.koyeb.app/
+  - url: https://chronic-janaya-seokbeom-f8bd352a.koyeb.app
 
 paths:
-  /tasks:
-    get:
-      summary: Get tasks from Notion
-      operationId: getTasks
+  /gpt-webhook:
+    post:
+      operationId: submitUnifiedPayload
+      summary: Submit schedule, task, prayer, auto-scheduling or report data using a unified format
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnifiedPayload'
       responses:
         '200':
-          description: A list of tasks
+          description: 요청이 성공적으로 전송되었습니다.
+
+  /get-notion-data:
+    post:
+      operationId: fetchNotionData
+      summary: Notion DB에서 업무 데이터를 조회합니다.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}  # ✅ OpenAI 파서 오류 방지용
+      responses:
+        '200':
+          description: 조회 성공
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    title:
-                      type: string
-                    due:
-                      type: string
-                    description:
-                      type: string
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        deadline:
+                          type: string
+                          format: date
+                        status:
+                          type: string
+                        duration:
+                          type: number
+
+  /add-notion-task:
+    post:
+      operationId: saveNotionTask
+      summary: Notion DB에 업무를 저장합니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                deadline:
+                  type: string
+                  format: date
+                status:
+                  type: string
+                duration:
+                  type: number
+              required: [title, deadline]
+      responses:
+        '200':
+          description: 저장 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    UnifiedPayload:
+      type: object
+      properties:
+        종류:
+          type: string
+          enum: [일정, 할 일, 기도, 스케줄, 보고서]
+        title:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        location:
+          type: string
+        due:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: string
+              pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+        date:
+          type: string
+          format: date
+        range:
+          type: string
+          enum: [day, week, month]
+        tasks:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              deadline:
+                type: string
+                format: date
+              priority:
+                type: string
+                enum: [높음, 중간, 낮음]
+              duration:
+                type: number
+              detail:
+                type: string
+              시간대:
+                type: string
+                enum: [오전, 오후]
+            required: [title, deadline, priority, duration]
+        period:
+          type: string
+          enum: [week, month]
+        done_tasks:
+          type: array
+          items:
+            type: string
+        ongoing_tasks:
+          type: array
+          items:
+            type: string
+        issues:
+          type: array
+          items:
+            type: string
+      required: [종류, title, description]
+      allOf:
+        - if:
+            properties:
+              종류:
+                const: 일정
+          then:
+            required: [start, end, location]
+        - if:
+            properties:
+              종류:
+                const: 할 일
+          then:
+            required: [due]
+        - if:
+            properties:
+              종류:
+                const: 기도
+          then:
+            required: [date]
+        - if:
+            properties:
+              종류:
+                const: 스케줄
+          then:
+            required: [range, tasks]
+        - if:
+            properties:
+              종류:
+                const: 보고서
+          then:
+            required: [period, done_tasks, ongoing_tasks]
+      additionalProperties: false
