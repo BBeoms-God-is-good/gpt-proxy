@@ -55,6 +55,7 @@ app.get("/tasks", (req, res) => {
 // =========================
 const notionToken = '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';
 const databaseId = '1c730b44dc0081018323e64ee18b9acb';
+const databaseId2 = '1d630b44dc0080eb9262f744b6b37e15';
 
 app.post('/get-notion-data', async (req, res) => {
   try {
@@ -97,7 +98,7 @@ app.post('/add-notion-task', async (req, res) => {
     const createRes = await axios.post(
       'https://api.notion.com/v1/pages',
       {
-        parent: { database_id: databaseId },
+        parent: { database_id: databaseId2 },
         properties: {
           Name: {
             title: [{ text: { content: title } }]
