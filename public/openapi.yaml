@@ -30,7 +30,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}  # ✅ OpenAI 파서 오류 방지용
+              properties: {}
       responses:
         '200':
           description: 조회 성공
@@ -44,15 +44,17 @@ paths:
                     items:
                       type: object
                       properties:
-                        title:
+                        할일:
                           type: string
-                        deadline:
+                        마감일:
                           type: string
                           format: date
-                        status:
+                        진행상황:
                           type: string
-                        duration:
+                        예상소요시간:
                           type: number
+                        우선순위:
+                          type: string
 
   /add-notion-task:
     post:
