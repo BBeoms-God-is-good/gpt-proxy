@@ -3,20 +3,19 @@ const express = require("express");
 const axios = require("axios");
 const app = express();
 
-// ✅ MIME 타입 설정 추가 (가장 먼저)
+// ✅ MIME 타입 설정
 app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith(".yaml")) {
       res.setHeader("Content-Type", "application/yaml");
-      res.setHeader("Content-Disposition", "inline"); // 🔥 이 줄이 중요합니다!
+      res.setHeader("Content-Disposition", "inline");
     }
   }
 }));
 
-
 app.use(express.json());
 
-// 📬 웹훅 수신 후 Make로 전달
+// 🔗 Webhook → Make로 전달
 app.post("/gpt-webhook", async (req, res) => {
   try {
     await axios.post(
@@ -35,7 +34,7 @@ app.post("/gpt-webhook", async (req, res) => {
   }
 });
 
-// ✅ GPT가 호출할 수 있는 테스트용 tasks API
+// ✅ 테스트용 API
 app.get("/tasks", (req, res) => {
   res.json([
     {
@@ -51,6 +50,85 @@ app.get("/tasks", (req, res) => {
   ]);
 });
 
-// 🚀 서버 실행
+// =========================
+// ✅ 1. Notion DB 불러오기
+// =========================
+const notionToken = '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';
+const databaseId = '1c730b44dc0081018323e64ee18b9acb';
+
+app.post('/get-notion-data', async (req, res) => {
+  try {
+    const response = await axios.post(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const tasks = response.data.results.map((page) => {
+      const props = page.properties;
+      return {
+        title: props.Name?.title?.[0]?.plain_text || '제목 없음',
+        deadline: props.Deadline?.date?.start || '날짜 없음',
+        status: props.Status?.select?.name || '상태 없음',
+        duration: props.예상소요시간?.number || 0
+      };
+    });
+
+    res.json({ tasks });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: 'Notion 데이터 불러오기 실패' });
+  }
+});
+
+// =========================
+// ✅ 2. Notion DB에 저장하기
+// =========================
+app.post('/add-notion-task', async (req, res) => {
+  const { title, deadline, status, duration } = req.body;
+
+  try {
+    const createRes = await axios.post(
+      'https://api.notion.com/v1/pages',
+      {
+        parent: { database_id: databaseId },
+        properties: {
+          Name: {
+            title: [{ text: { content: title } }]
+          },
+          Deadline: {
+            date: { start: deadline }
+          },
+          Status: {
+            select: { name: status }
+          },
+          예상소요시간: {
+            number: duration
+          }
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    res.status(200).json({ message: '작업이 성공적으로 저장되었습니다.' });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ error: '작업 저장 실패' });
+  }
+});
+
+// ✅ 서버 실행
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 프록시 서버 실행 중 on ${PORT}`));
