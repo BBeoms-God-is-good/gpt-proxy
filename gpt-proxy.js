@@ -20,7 +20,7 @@ app.use(express.json());
 app.post("/gpt-webhook", async (req, res) => {
   try {
     await axios.post(
-      "https://hook.us2.make.com/qihpvwxoxkxp4qo3qnppez3i2qo7flpt",
+      "https://hook.us2.make.com/gvug7if3cxsittuhskjkuuxaki8deh1s",
       req.body,
       {
         headers: {
