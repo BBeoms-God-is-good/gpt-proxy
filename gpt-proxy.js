@@ -153,6 +153,41 @@ app.post('/add-notion-task', async (req, res) => {
   }
 });
 
+// ==========================
+// ✅ 3. 저장된 스케줄 조회하기
+// ==========================
+app.post('/get-saved-schedule', async (req, res) => {
+  try {
+    const response = await axios.post(
+      `https://api.notion.com/v1/databases/${databaseId2}/query`,
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const schedules = response.data.results.map((page) => {
+      const props = page.properties;
+      return {
+        title: props["Name"]?.title?.[0]?.plain_text || "제목 없음",
+        deadline: props["Deadline"]?.date?.start || "날짜 없음",
+        status: props["Status"]?.select?.name || "없음",
+        duration: props["예상소요시간"]?.number || 0
+      };
+    });
+
+    res.json({ schedules });
+  } catch (error) {
+    console.error("❌ 스케줄 조회 실패:", error.response?.data || error.message);
+    res.status(500).json({ error: "스케줄 조회 실패" });
+  }
+});
+
+
 // ✅ 서버 실행
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 프록시 서버 실행 중 on ${PORT}`));
