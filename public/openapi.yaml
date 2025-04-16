@@ -5,7 +5,7 @@ info:
 
 servers:
   - url: https://chronic-janaya-seokbeom-f8bd352a.koyeb.app
-
+ 
 paths:
   /gpt-webhook:
     post:
