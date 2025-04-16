@@ -1,3 +1,14 @@
+app.listen(PORT, () => {
+  console.log(`🚀 프록시 서버 실행 중 on ${PORT}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❗ 포트 ${PORT}는 이미 사용 중입니다.`);
+    process.exit(1);
+  } else {
+    throw err;
+  }
+});
+
 const path = require("path");
 const express = require("express");
 const axios = require("axios");
