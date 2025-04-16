@@ -75,11 +75,14 @@ app.post('/get-notion-data', async (req, res) => {
       return {
         할일: props["할일"]?.title?.[0]?.plain_text || "제목 없음",
         마감일: props["마감일"]?.date?.start || null,
-        진행상황: props["진행상황"]?.select?.name || "상태 없음",
+        진행상황: props["진행상황"]?.status?.name || 
+                 props["진행상황"]?.select?.name || 
+                 "상태 없음",
         예상소요시간: props["예상소요시간"]?.number || 0,
         우선순위: props["우선순위"]?.select?.name || "없음"
       };
     });
+
 
     const filteredTasks = rawTasks.filter(task => {
       // ✅ 완료 상태 제외
