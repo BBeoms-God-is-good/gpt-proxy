@@ -84,19 +84,23 @@ app.post('/get-notion-data', async (req, res) => {
     });
 
 
-    const filteredTasks = rawTasks.filter(task => {
-      // ✅ 완료 상태 제외
-      if (excludeStatus && task.진행상황 === excludeStatus) return false;
+  const filteredTasks = rawTasks.filter(task => {
+  // ✅ 완료 항목은 기본적으로 제외
+  if (task.진행상황 === "✅완료") return false;
 
-      // ✅ 마감일 필터 (예: 3개월 이내)
-      if (deadlineAfter && task.마감일) {
-        const taskDate = new Date(task.마감일);
-        const afterDate = new Date(deadlineAfter);
-        if (taskDate < afterDate) return false;
-      }
+  // ✅ 추가 요청 시 제외 상태가 따로 지정되었으면 그 상태도 제외
+  if (excludeStatus && task.진행상황 === excludeStatus) return false;
 
-      return true;
-    });
+  // ✅ 마감일 필터
+  if (deadlineAfter && task.마감일) {
+    const taskDate = new Date(task.마감일);
+    const afterDate = new Date(deadlineAfter);
+    if (taskDate < afterDate) return false;
+  }
+
+  return true;
+});
+
 
     res.json({ tasks: filteredTasks });
   } catch (error) {
