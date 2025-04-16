@@ -49,13 +49,12 @@ app.get("/tasks", (req, res) => {
 });
 
 // ==========================
-// ✅ 1. Notion DB 불러오기
+// ✅ 1. Notion DB 불러오기 (수정됨)
 // ==========================
 const notionToken = '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';
 const databaseId = '1c730b44dc0081018323e64ee18b9acb';
 
-// GPT에서 호출할 operationId: fetchNotionData 에 맞는 함수
-async function fetchNotionData(req, res) {
+app.post('/get-notion-data', async (req, res) => {
   try {
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${databaseId}/query`,
@@ -72,20 +71,20 @@ async function fetchNotionData(req, res) {
     const tasks = response.data.results.map((page) => {
       const props = page.properties;
       return {
-        title: props.Name?.title?.[0]?.plain_text || '제목 없음',
-        deadline: props.Deadline?.date?.start || '날짜 없음',
-        status: props.Status?.select?.name || '상태 없음',
-        duration: props.예상소요시간?.number || 0
+        할일: props["할일"]?.title?.[0]?.plain_text || "제목 없음",
+        마감일: props["마감일"]?.date?.start || "날짜 없음",
+        진행상황: props["진행상황"]?.select?.name || "상태 없음",
+        예상소요시간: props["예상소요시간"]?.number || 0,
+        우선순위: props["우선순위"]?.select?.name || "없음"
       };
     });
 
     res.json({ tasks });
   } catch (error) {
     console.error(error.response?.data || error.message);
-    res.status(500).json({ error: 'Notion 데이터 불러오기 실패' });
+    res.status(500).json({ error: "Notion 데이터 불러오기 실패" });
   }
-}
-app.post('/get-notion-data', fetchNotionData);
+});
 
 // ==========================
 // ✅ 2. Notion DB에 저장하기
