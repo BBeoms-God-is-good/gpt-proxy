@@ -3,6 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors"); // CORS 허용
 const app = express();
+app.use(express.static('public')); // 'public' 폴더에 openai.yaml 위치
 
 app.use(cors());
 app.use(express.json());
