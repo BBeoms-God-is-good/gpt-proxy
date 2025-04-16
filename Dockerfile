@@ -5,6 +5,8 @@ WORKDIR /app
 # 종속성 파일 복사
 COPY package*.json ./
 
+COPY public ./public
+
 # npm 설치 강제 재시도 + 무시 옵션
 RUN npm install --legacy-peer-deps --force
 
