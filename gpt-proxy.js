@@ -49,12 +49,14 @@ app.get("/tasks", (req, res) => {
 });
 
 // ==========================
-// ✅ 1. Notion DB 불러오기 (수정됨)
+// ✅ Notion DB 불러오기 (완료 제외 + 마감일 필터 추가됨)
 // ==========================
 const notionToken = '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';
 const databaseId = '1c730b44dc0081018323e64ee18b9acb';
 
 app.post('/get-notion-data', async (req, res) => {
+  const { excludeStatus, deadlineAfter } = req.body;
+
   try {
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${databaseId}/query`,
@@ -68,20 +70,34 @@ app.post('/get-notion-data', async (req, res) => {
       }
     );
 
-    const tasks = response.data.results.map((page) => {
+    const rawTasks = response.data.results.map((page) => {
       const props = page.properties;
       return {
         할일: props["할일"]?.title?.[0]?.plain_text || "제목 없음",
-        마감일: props["마감일"]?.date?.start || "날짜 없음",
+        마감일: props["마감일"]?.date?.start || null,
         진행상황: props["진행상황"]?.select?.name || "상태 없음",
         예상소요시간: props["예상소요시간"]?.number || 0,
         우선순위: props["우선순위"]?.select?.name || "없음"
       };
     });
 
-    res.json({ tasks });
+    const filteredTasks = rawTasks.filter(task => {
+      // ✅ 완료 상태 제외
+      if (excludeStatus && task.진행상황 === excludeStatus) return false;
+
+      // ✅ 마감일 필터 (예: 3개월 이내)
+      if (deadlineAfter && task.마감일) {
+        const taskDate = new Date(task.마감일);
+        const afterDate = new Date(deadlineAfter);
+        if (taskDate < afterDate) return false;
+      }
+
+      return true;
+    });
+
+    res.json({ tasks: filteredTasks });
   } catch (error) {
-    console.error(error.response?.data || error.message);
+    console.error("❌ Notion 데이터 오류:", error.response?.data || error.message);
     res.status(500).json({ error: "Notion 데이터 불러오기 실패" });
   }
 });
