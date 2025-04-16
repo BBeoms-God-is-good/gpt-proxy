@@ -1,17 +1,11 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Notion Task Fetcher",
-  "name_for_model": "notion_task_plugin",
-  "description_for_human": "Get your tasks from Notion DB.",
-  "description_for_model": "Plugin for retrieving tasks from a Notion DB.",
-  "auth": {
-    "type": "none"
-  },
+  "name_for_human": "Notion Schedule Assistant",
+  "name_for_model": "notion_proxy",
+  "description_for_model": "Schedule planner & task fetcher using Notion DB.",
   "api": {
     "type": "openapi",
-    "url": "https://chronic-janaya-seokbeom-f8bd352a.koyeb.app/openapi.json"
+    "url": "https://chronic-janaya-seokbeom-f8bd352a.koyeb.app/openapi.yaml"
   },
-  "logo_url": "https://chronic-janaya-seokbeom-f8bd352a.koyeb.app/logo.png",
-  "contact_email": "your@email.com",
-  "legal_info_url": "https://your-site.com/legal"
+  "auth": { "type": "none" }
 }
