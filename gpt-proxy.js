@@ -44,9 +44,14 @@ app.post("/daily-log", async (req, res) => {
 
     res.status(200).json({ ok: true });
   } catch (e) {
-    console.error("❌ daily-log 프록시 오류:", e.response?.data || e.message);
-    res.status(500).json({ ok: false });
+  console.error("❌ daily-log 프록시 오류:", e.response?.data || e.message);
+
+  res.status(500).json({
+    ok: false,
+    error: e.response?.data || e.message
+  });
   }
+
 });
 
 // ✅ 테스트용 API
