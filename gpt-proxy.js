@@ -33,6 +33,22 @@ app.post("/gpt-webhook", async (req, res) => {
   }
 });
 
+// 일상기록 웹훅
+app.post("/daily-log", async (req, res) => {
+  try {
+    await axios.post(
+      "https://hook.us2.make.com/0h4u4gnldli3jnmuz3ld7h94apc9d2lx",
+      req.body,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    res.status(200).json({ ok: true });
+  } catch (e) {
+    console.error("❌ daily-log 프록시 오류:", e.response?.data || e.message);
+    res.status(500).json({ ok: false });
+  }
+});
+
 // ✅ 테스트용 API
 app.get("/tasks", (req, res) => {
   res.json([
